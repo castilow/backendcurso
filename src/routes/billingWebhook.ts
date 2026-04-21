@@ -20,6 +20,7 @@ import {
   normalizeEmail,
   upsertPurchase,
 } from '../lib/purchasesStore'
+import { inviteUserByEmailSafe } from '../lib/userInvite'
 
 function customerIdFromUnion(
   value: string | Stripe.Customer | Stripe.DeletedCustomer | null | undefined,
@@ -134,6 +135,18 @@ export async function billingWebhookHandler(
 
         // eslint-disable-next-line no-console
         console.info('[stripe-webhook] acceso concedido a', email)
+
+        // Invitar al usuario a Supabase Auth para que configure
+        // contraseña y pueda logarse en tpc-main. No bloquea el
+        // webhook: si el invite falla (red, rate-limit, SMTP),
+        // logueamos y seguimos. El acceso ya está concedido en
+        // billing_access; el email se puede reenviar con
+        // scripts/inviteUser.mjs.
+        void inviteUserByEmailSafe(email).catch((err) => {
+          // inviteUserByEmailSafe no debe lanzar, pero por si acaso.
+          // eslint-disable-next-line no-console
+          console.warn('[stripe-webhook] invite threw (no debería)', err)
+        })
         break
       }
 
