@@ -23,7 +23,11 @@ if (!email || !email.includes('@')) {
 
 const url = process.env.SUPABASE_URL
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY
-const redirectTo = process.env.FRONTEND_URL?.trim() || ''
+// Ruta que recibe el hash de Supabase y muestra el formulario de
+// configurar contraseña en tpc-main.
+const INVITE_REDIRECT_PATH = '/reset-password'
+const frontendBase = (process.env.FRONTEND_URL?.trim() || '').replace(/\/+$/, '')
+const redirectTo = frontendBase ? `${frontendBase}${INVITE_REDIRECT_PATH}` : ''
 
 if (!url || !key) {
   console.error('Falta SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY en .env')

@@ -41,8 +41,25 @@ function isAlreadyRegistered(msg: string | undefined): boolean {
 }
 
 /**
+ * Ruta dentro del frontend (tpc-main) que recibe el token de invite/
+ * recovery y muestra formulario para elegir contraseña. El redirect
+ * DEBE apuntar a esta ruta para que el usuario pueda configurar su
+ * contraseña; si apunta al root, Supabase crea la sesión pero el
+ * frontend pierde el hash y el usuario queda atrapado sin poder setear
+ * password.
+ */
+const INVITE_REDIRECT_PATH = '/reset-password'
+
+function buildDefaultRedirect(): string {
+  const base = (config.frontendUrl ?? '').trim().replace(/\/+$/, '')
+  if (!base) return ''
+  return `${base}${INVITE_REDIRECT_PATH}`
+}
+
+/**
  * Invita por email. No lanza — devuelve InviteResult. Si `redirectTo`
- * no se pasa, usa config.frontendUrl.
+ * no se pasa, usa config.frontendUrl + /reset-password para que el
+ * usuario aterrice en la página de establecer contraseña.
  */
 export async function inviteUserByEmailSafe(
   email: string,
@@ -53,7 +70,7 @@ export async function inviteUserByEmailSafe(
     return { ok: false, alreadyExisted: false, error: 'email inválido' }
   }
 
-  const redirect = (redirectTo ?? config.frontendUrl ?? '').trim()
+  const redirect = (redirectTo ?? buildDefaultRedirect()).trim()
 
   try {
     const supabase = getSupabase()
