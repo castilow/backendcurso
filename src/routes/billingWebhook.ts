@@ -20,7 +20,7 @@ import {
   normalizeEmail,
   upsertPurchase,
 } from '../lib/purchasesStore'
-import { inviteUserByEmailSafe } from '../lib/userInvite'
+import { provisionAccountAfterPayment } from '../lib/accountProvisioning'
 
 function customerIdFromUnion(
   value: string | Stripe.Customer | Stripe.DeletedCustomer | null | undefined,
@@ -136,16 +136,16 @@ export async function billingWebhookHandler(
         // eslint-disable-next-line no-console
         console.info('[stripe-webhook] acceso concedido a', email)
 
-        // Invitar al usuario a Supabase Auth para que configure
-        // contraseña y pueda logarse en tpc-main. No bloquea el
-        // webhook: si el invite falla (red, rate-limit, SMTP),
-        // logueamos y seguimos. El acceso ya está concedido en
-        // billing_access; el email se puede reenviar con
-        // scripts/inviteUser.mjs.
-        void inviteUserByEmailSafe(email).catch((err) => {
-          // inviteUserByEmailSafe no debe lanzar, pero por si acaso.
+        // Provisionar cuenta en Supabase Auth con contraseña aleatoria
+        // y mandar email con credenciales (Opción B — sin invite).
+        // No bloquea el webhook: si falla el email o la creación del
+        // usuario, logueamos y seguimos. El acceso ya está concedido
+        // en billing_access; el usuario puede usar "Olvidé contraseña"
+        // como fallback para generarse una contraseña nueva.
+        void provisionAccountAfterPayment(email).catch((err) => {
+          // provisionAccountAfterPayment no debe lanzar, pero por si acaso.
           // eslint-disable-next-line no-console
-          console.warn('[stripe-webhook] invite threw (no debería)', err)
+          console.warn('[stripe-webhook] provision threw (no debería)', err)
         })
         break
       }

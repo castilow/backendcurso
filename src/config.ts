@@ -43,6 +43,21 @@ export const config = {
     url: process.env.SUPABASE_URL?.trim() || '',
     serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || '',
   },
+  /**
+   * Resend (email transaccional). Tras un pago en Stripe se crea el
+   * usuario en Supabase Auth con una contraseña aleatoria y se envía
+   * un email con las credenciales.
+   *
+   *   RESEND_API_KEY  — obligatorio para que el email salga
+   *   RESEND_FROM     — remitente. Ej: 'Broker de Coches <no-reply@brokerdecoches.com>'.
+   *                     Durante pruebas puede ser 'onboarding@resend.dev'
+   *                     (el sandbox de Resend), pero SOLO llega a la
+   *                     propia cuenta del dueño de la API key.
+   */
+  resend: {
+    apiKey: process.env.RESEND_API_KEY?.trim() || '',
+    from: process.env.RESEND_FROM?.trim() || 'onboarding@resend.dev',
+  },
 } as const
 
 export type AppConfig = typeof config
@@ -55,4 +70,9 @@ export function isStripeConfigured(): boolean {
 /** Devuelve true si Supabase está configurado (url + service role). */
 export function isSupabaseConfigured(): boolean {
   return Boolean(config.supabase.url && config.supabase.serviceRoleKey)
+}
+
+/** Devuelve true si Resend está configurado (API key presente). */
+export function isResendConfigured(): boolean {
+  return Boolean(config.resend.apiKey)
 }
