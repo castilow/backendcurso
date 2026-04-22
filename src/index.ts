@@ -65,6 +65,20 @@ const server = app.listen(config.port, () => {
       config.corsOrigins.length ? config.corsOrigins.join(', ') : '(vacío, solo localhost en dev)'
     }`,
   )
+  // Diagnóstico de env vars críticas (sin imprimir valores):
+  // eslint-disable-next-line no-console
+  console.info(
+    '[backendcursos] env present:',
+    JSON.stringify({
+      STRIPE_SECRET_KEY: Boolean(config.stripe.secretKey),
+      STRIPE_WEBHOOK_SECRET: Boolean(config.stripe.webhookSecret),
+      SUPABASE_URL: Boolean(config.supabase.url),
+      SUPABASE_SERVICE_ROLE_KEY: Boolean(config.supabase.serviceRoleKey),
+      RESEND_API_KEY: Boolean(config.resend.apiKey),
+      RESEND_FROM: config.resend.from,
+      FRONTEND_URL: config.frontendUrl,
+    }),
+  )
 })
 
 function shutdown(signal: string) {
