@@ -16,6 +16,7 @@ import healthRouter from './routes/health'
 import coursesRouter from './routes/courses'
 import lessonsRouter from './routes/lessons'
 import billingRouter from './routes/billing'
+import postersRouter from './routes/posters'
 import { billingWebhookHandler } from './routes/billingWebhook'
 
 const app = express()
@@ -46,6 +47,11 @@ if (config.isDev) {
 // Rutas
 app.use('/health', healthRouter)
 app.use('/api/health', healthRouter)
+// Generación de pósters (.jpg) para los vídeos del bucket. Protegido con
+// requireInternalAuth — NO se expone al navegador, sólo server-to-server.
+// Va ANTES de coursesRouter para que `/api/courses/posters/...` no entre
+// en el route handler `/:id` del router de cursos.
+app.use('/api/courses/posters', postersRouter)
 app.use('/api/courses', coursesRouter)
 app.use('/api/lessons', lessonsRouter)
 app.use('/api/billing', billingRouter)

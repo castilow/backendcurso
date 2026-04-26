@@ -44,6 +44,15 @@ export const config = {
     serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || '',
   },
   /**
+   * Storage de cursos. Los .mp4 viven en este bucket. Los pósters generados
+   * (frame del segundo 2 como JPG) se suben al mismo bucket bajo `posters/`.
+   * Por defecto: bucket "curso" del proyecto Supabase configurado arriba.
+   */
+  courseStorage: {
+    bucket: process.env.COURSE_STORAGE_BUCKET?.trim() || 'curso',
+    posterPrefix: process.env.COURSE_POSTER_PREFIX?.trim() || 'posters',
+  },
+  /**
    * Resend (email transaccional). Tras un pago en Stripe se crea el
    * usuario en Supabase Auth con una contraseña aleatoria y se envía
    * un email con las credenciales.
