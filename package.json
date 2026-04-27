@@ -11,6 +11,8 @@
     "postinstall": "tsc -p tsconfig.json || echo 'tsc skipped (no tsconfig o tsc no disponible)'",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "setup:stripe": "tsx scripts/setupStripe.ts",
+    "videos:optimize": "tsx scripts/recompressCourseVideos.ts",
+    "videos:optimize:dry": "tsx scripts/recompressCourseVideos.ts --dry-run",
     "lint": "echo \"(sin lint configurado)\" && exit 0"
   },
   "engines": {

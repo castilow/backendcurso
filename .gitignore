@@ -4,6 +4,8 @@ dist
 .env.local
 .env.*.local
 npm-debug.log*
+# Estado local del script de recompresión de vídeos (qué .mp4 ya fueron procesados)
+scripts/.recompress-state.json
 yarn-debug.log*
 yarn-error.log*
 .DS_Store
