@@ -17,6 +17,7 @@ import coursesRouter from './routes/courses'
 import lessonsRouter from './routes/lessons'
 import billingRouter from './routes/billing'
 import postersRouter from './routes/posters'
+import mailerRouter from './routes/mailer'
 import { billingWebhookHandler } from './routes/billingWebhook'
 
 const app = express()
@@ -55,6 +56,7 @@ app.use('/api/courses/posters', postersRouter)
 app.use('/api/courses', coursesRouter)
 app.use('/api/lessons', lessonsRouter)
 app.use('/api/billing', billingRouter)
+app.use('/api/mailer', mailerRouter)
 
 // Fallbacks
 app.use(notFoundHandler)
