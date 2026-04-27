@@ -35,6 +35,27 @@ export interface ProvisionResult {
   error: string | null
 }
 
+async function ensureUserProfile(userId: string, email: string): Promise<void> {
+  const supabase = getSupabase()
+  const localPart = email.split('@')[0] || 'usuario'
+  const username = localPart.replace(/[^a-zA-Z0-9_.-]/g, '').slice(0, 40) || 'usuario'
+  const fullName = localPart.replace(/[._-]+/g, ' ').trim() || localPart
+  const now = new Date().toISOString()
+
+  await supabase.from('user_profiles').upsert(
+    {
+      user_id: userId,
+      full_name: fullName,
+      username,
+      role: 'user',
+      hierarchy_scope: null,
+      submit_request: 'accepted',
+      updated_at: now,
+    },
+    { onConflict: 'user_id' },
+  )
+}
+
 function isAlreadyRegistered(msg: string | undefined): boolean {
   if (!msg) return false
   const lower = msg.toLowerCase()
@@ -135,6 +156,17 @@ export async function provisionAccountAfterPayment(
       emailSent: false,
       userId: null,
       error: msg,
+    }
+  }
+
+  // Usuario recién creado → asegurar perfil base en user_profiles.
+  if (userId) {
+    try {
+      await ensureUserProfile(userId, trimmed)
+    } catch (profileErr) {
+      // No bloqueamos el provisioning por fallo de perfil.
+      // eslint-disable-next-line no-console
+      console.warn('[provision] no se pudo upsert user_profiles para', trimmed, profileErr)
     }
   }
 
